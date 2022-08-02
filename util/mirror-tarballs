@@ -28,7 +28,8 @@ fi
 #################################
 
 ver="$main_ver"
-$root/util/get-tarball "https://openresty.org/download/nginx-$ver.tar.gz" -O nginx-$ver.tar.gz || exit 1
+echo $ver
+$root/util/get-tarball "https://nginx.org/download/nginx-$ver.tar.gz" -O nginx-$ver.tar.gz || exit 1
 tar -xzf nginx-$ver.tar.gz || exit 1
 cd nginx-$ver || exit 1
 
@@ -44,6 +45,7 @@ if [ "$answer" = "N" ]; then
 fi
 
 answer=`$root/util/ver-ge "$main_ver" 1.13.3`
+echo $answer
 if [ "$answer" = "Y" ]; then
     echo "$info_txt applying the stream_balancer_export patch for nginx"
     patch -p1 < $root/patches/nginx-$main_ver-stream_balancer_export.patch || exit 1
@@ -519,6 +521,7 @@ echo "$info_txt applying the reuseport_close_unused_fds patch for nginx"
 patch -p1 < $root/patches/nginx-$main_ver-reuseport_close_unused_fds.patch || exit 1
 echo
 
+mkdir -p docs/html
 cp $root/html/index.html docs/html/ || exit 1
 cp $root/html/50x.html docs/html/ || exit 1
 
@@ -575,7 +578,7 @@ mv openresty-rds-csv-nginx-module-* rds-csv-nginx-module-$ver || exit 1
 
 #################################
 
-ver=0.33
+ver=0.34
 $root/util/get-tarball "https://github.com/openresty/headers-more-nginx-module/tarball/v$ver" -O headers-more-nginx-module-$ver.tar.gz || exit 1
 tar -xzf headers-more-nginx-module-$ver.tar.gz || exit 1
 mv openresty-headers-more-nginx-module-* headers-more-nginx-module-$ver || exit 1
@@ -589,10 +592,9 @@ mv openresty-drizzle-nginx-module-* drizzle-nginx-module-$ver || exit 1
 
 #################################
 
-ver=0.10.21
-$root/util/get-tarball "https://github.com/openresty/lua-nginx-module/archive/v$ver.tar.gz" -O lua-nginx-module-$ver.tar.gz || exit 1
-tar -xzf lua-nginx-module-$ver.tar.gz || exit 1
-mv lua-nginx-module-$ver ngx_lua-$ver || exit 1
+ver=0.10.22 # fake #9b7bde2e7986d2150606e33e303c6bd1c40271a6
+git clone https://github.com/openresty/lua-nginx-module.git ./ngx_lua-$ver
+rm -rf ./ngx_lua-$ver/.git # fix permission issue
 
 #################################
 
@@ -624,10 +626,10 @@ mv openresty-memc-nginx-module-* memc-nginx-module-$ver || exit 1
 
 #################################
 
-ver=0.32
-$root/util/get-tarball "https://github.com/openresty/srcache-nginx-module/tarball/v$ver" -O srcache-nginx-module-$ver.tar.gz || exit 1
-tar -xzf srcache-nginx-module-$ver.tar.gz || exit 1
-mv openresty-srcache-nginx-module-* srcache-nginx-module-$ver || exit 1
+ver=0.33 # fake #be22ac0dcd9245aadcaca3220da96a0c1a0285a7
+echo $PWD
+git clone https://github.com/openresty/srcache-nginx-module.git ./srcache-nginx-module-$ver 
+rm -rf ./srcache-nginx-module-$ver/.git # fix permission issue
 
 #################################
 
