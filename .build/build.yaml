@@ -1,0 +1,44 @@
+apiVersion: builds.katanomi.dev/v1alpha1
+kind: Build
+spec:
+  runTemplate:
+    spec:
+      workspaces:
+      - name: source
+        volumeClaimTemplate:
+          spec:
+            accessModes:
+              - ReadWriteMany
+            resources:
+              requests:
+                storage: 500Mi
+  workspaces:
+    - description: >
+        This workspace is shared among all the pipeline tasks to read/write
+        common resources
+      name: source
+  tasks:
+    - name: build-alb-nginx
+      timeout: 30m
+      retries: 3
+      taskRef:
+        kind: ClusterTask
+        name: alauda-build-image
+      workspaces:
+        - name: source
+          workspace: source
+      params:
+        - name: container-image
+          value: build-harbor.alauda.cn/acp/alb-nginx
+        - name: container-image-tag
+          value: "1.22.0"
+        - name: dockerfile
+          value: ./util/nginx-1.22.0.dockerfile
+        - name: platform
+          value:
+            - linux/amd64
+            - linux/arm64
+        - name: tools-image
+          value: registry.alauda.cn:60080/devops/builder-tools:v3.8-0-g377a3f9
+        - name: verbose
+          value: "true"
